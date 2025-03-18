@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art Builder</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background-color: #f4f4f9;
+      padding: 20px;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+
+    /* Aqui você pode ajustar o tamanho da imagem da logo */
+    .logo {
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(50, 20px);
+      grid-template-rows: repeat(50, 20px);
+      gap: 2px;
+      justify-content: center;
+      margin-bottom: 20px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      padding: 10px;
+    }
+
+    .pixel {
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(1);
+    }
+
+    .color-picker {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="color"] {
+      width: 50px;
+      height: 50px;
+      border: none;
+      cursor: pointer;
+      border-radius: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    input[type="color"]:hover {
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    #themeToggle {
+      margin-top: 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .theme-toggle-container {
+      margin-top: 20px;
+    }
+
+    .canvas-container {
+      position: relative;
+    }
+
+    /* Estilo para o modo escuro */
+    body.dark-mode {
+      background-color: #2c2c2c;
+      color: #fff;
+    }
+
+    body.dark-mode .grid-container {
+      background-color: #444;
+      border: 2px solid #666;
+    }
+
+    body.dark-mode button {
+      background-color: #007bff;
+    }
+
+    body.dark-mode button:hover {
+      background-color: #0056b3;
+    }
+
+    body.dark-mode h1 {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Substituindo o título por uma imagem -->
+  <img src="pixelartbuilder.png" alt="Logo do Jogo" class="logo">
+
+  <div class="controls">
+    <button id="brushBtn">🖌️</button>
+    <button id="eraserBtn">🧼</button>
+    <button id="clearBtn">🗑️ Limpar</button>
+  </div>
+
+  <div class="color-picker">
+    <label for="colorPicker" style="font-weight: bold; font-size: 18px;">Escolha a cor:</label>
+    <input type="color" id="colorPicker" value="#000000">
+  </div>
+
+  <div class="grid-container" id="gridContainer"></div>
+
+  <button id="saveBtn">Salvar como PNG</button>
+
+  <div class="theme-toggle-container">
+    <label for="themeToggle" style="font-weight: bold;">Modo Escuro:</label>
+    <input type="checkbox" id="themeToggle">
+  </div>
+
+  <script>
+    const gridContainer = document.getElementById("gridContainer");
+    const colorPicker = document.getElementById("colorPicker");
+    const brushBtn = document.getElementById("brushBtn");
+    const eraserBtn = document.getElementById("eraserBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const themeToggle = document.getElementById("themeToggle");
+
+    let drawing = false;
+    let currentColor = "#000000";
+    let isErasing = false;
+
+    // Criar o grid
+    function createGrid() {
+      for (let i = 0; i < 2500; i++) {
+        const pixel = document.createElement("div");
+        pixel.classList.add("pixel");
+        pixel.addEventListener("mousedown", () => {
+          drawing = true;
+          paintPixel(pixel);
+        });
+        pixel.addEventListener("mouseover", () => {
+          if (drawing) paintPixel(pixel);
+        });
+        pixel.addEventListener("mouseup", () => {
+          drawing = false;
+        });
+        gridContainer.appendChild(pixel);
+      }
+    }
+
+    // Pintar um pixel
+    function paintPixel(pixel) {
+      if (isErasing) {
+        pixel.style.backgroundColor = "white";
+      } else {
+        pixel.style.backgroundColor = currentColor;
+      }
+    }
+
+    // Atualiza a cor atual sempre que o usuário escolher uma nova cor
+    colorPicker.addEventListener("input", (e) => {
+      currentColor = e.target.value;
+    });
+
+    // Adicionar eventos de botão
+    brushBtn.addEventListener("click", () => {
+      isErasing = false;
+    });
+    eraserBtn.addEventListener("click", () => {
+      isErasing = true;
+    });
+    clearBtn.addEventListener("click", () => {
+      const pixels = document.querySelectorAll(".pixel");
+      pixels.forEach(pixel => pixel.style.backgroundColor = "white");
+    });
+
+    // Salvar imagem como PNG
+    saveBtn.addEventListener("click", () => {
+      const pixels = document.querySelectorAll(".pixel");
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const gridSize = 50;
+      const pixelSize = 20;
+
+      canvas.width = gridSize * pixelSize;
+      canvas.height = gridSize * pixelSize;
+
+      pixels.forEach((pixel, index) => {
+        const x = (index % gridSize) * pixelSize;
+        const y = Math.floor(index / gridSize) * pixelSize;
+        const color = pixel.style.backgroundColor;
+
+        // Definir o fundo transparente
+        ctx.fillStyle = color || "transparent";
+        ctx.fillRect(x, y, pixelSize, pixelSize);
+      });
+
+      // Salvar o canvas como PNG
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "pixel_art.png";
+      link.click();
+    });
+
+    // Alterar tema
+    themeToggle.addEventListener("change", () => {
+      document.body.classList.toggle("dark-mode", themeToggle.checked);
+    });
+
+    // Inicializar
+    createGrid();
+  </script>
+</body>
+</html>
