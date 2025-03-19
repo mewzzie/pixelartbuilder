@@ -37,7 +37,7 @@
     .pixel {
       width: 20px;
       height: 20px;
-      background-color: white;
+      background-color: transparent;
       border: 1px solid #ddd;
       cursor: pointer;
       transition: background-color 0.2s ease;
@@ -190,7 +190,7 @@
     // Pintar um pixel
     function paintPixel(pixel) {
       if (isErasing) {
-        pixel.style.backgroundColor = "white";
+        pixel.style.backgroundColor = "";
       } else {
         pixel.style.backgroundColor = currentColor;
       }
